@@ -114,6 +114,36 @@ spec:
         - mountPath: /grafana-dashboard-definitions/0/workload-total
           name: grafana-dashboard-workload-total
           readOnly: false
+      - name: tunnel
+        image: 176401959500.dkr.ecr.ap-southeast-1.amazonaws.com/tbox-cloudflare-argo:latest
+        imagePullPolicy: Always
+        command: ["/opt/cloudflared", "tunnel"]
+        args:
+        - --url=http://127.0.0.1:3000
+        - --hostname=grafana-dev.tbox.vn
+        - --origincert=/etc/cloudflared/cert.pem
+        - --no-autoupdate
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          limits:
+            cpu: 10m
+            memory: 20Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        volumeMounts:
+        - mountPath: /etc/cloudflared
+          name: tunnel-secret
+          readOnly: true
+      terminationGracePeriodSeconds: 60      
       nodeSelector:
         beta.kubernetes.io/os: linux
       securityContext:
@@ -121,6 +151,9 @@ spec:
         runAsUser: 65534
       serviceAccountName: grafana
       volumes:
+      - name: tunnel-secret
+        secret:
+          secretName: cloudflare-cert  
       - emptyDir: {}
         name: grafana-storage
       - name: grafana-datasources
