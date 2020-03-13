@@ -18,6 +18,13 @@ spec:
       containers:
       - image: grafana/grafana:6.6.0
         name: grafana
+        env:
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: "false"
+        - name: GF_SERVER_DOMAIN
+          value: grafana-dev.tbox.vn
+        - name: GF_SERVER_ROOT_URL
+          value: https://grafana-dev.tbox.vn
         ports:
         - containerPort: 3000
           name: http
@@ -116,13 +123,6 @@ spec:
           readOnly: false
       - name: tunnel
         image: 176401959500.dkr.ecr.ap-southeast-1.amazonaws.com/tbox-cloudflare-argo:latest
-        env:
-        - name: GF_AUTH_ANONYMOUS_ENABLED
-          value: "false"
-        - name: GF_SERVER_DOMAIN
-          value: grafana-dev.tbox.vn
-        - name: GF_SERVER_ROOT_URL
-          value: https://grafana-dev.tbox.vn
         imagePullPolicy: Always
         command: ["/opt/cloudflared", "tunnel"]
         args:
