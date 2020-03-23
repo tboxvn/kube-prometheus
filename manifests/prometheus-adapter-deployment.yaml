@@ -43,10 +43,16 @@ spec:
         kubernetes.io/os: linux
       serviceAccountName: prometheus-adapter
       volumes:
-      - emptyDir: {}
-        name: tmpfs
-      - emptyDir: {}
-        name: volume-serving-cert
+      - name: tmpfs
+        persistentVolumeClaim:
+          claimName: tmpfs
+      # - emptyDir: {}
+      #   name: tmpfs
+      - name: volume-serving-cert
+        persistentVolumeClaim:
+          claimName: volume-serving-cert
+      # - emptyDir: {}
+      #   name: volume-serving-cert
       - configMap:
           name: adapter-config
         name: config
